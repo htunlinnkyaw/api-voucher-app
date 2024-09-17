@@ -1,10 +1,17 @@
 import React from "react";
-import { HiOutlinePencil, HiOutlineTrash, HiPlus } from "react-icons/hi";
+import { HiPlus } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import ProductRowEmpty from "./ProductRowEmpty";
 import ProductRow from "./ProductRow";
+import useSWR from "swr";
+import ProductListLoader from "./ProductListLoader";
+import endpoint from "../constant/endpoint";
+
+const fetcher = (url) => fetch(url).then((res) => res.json());
 
 const ProductList = () => {
+  const { data, error, isLoading } = useSWR(`${endpoint}/products`, fetcher);
+
   return (
     <section className="mt-5">
       <div className="flex items-center justify-between mb-5">
@@ -69,8 +76,15 @@ const ProductList = () => {
             </tr>
           </thead>
           <tbody>
-            <ProductRowEmpty />
-            <ProductRow />
+            {isLoading ? (
+              <ProductListLoader />
+            ) : data.length === 0 ? (
+              <ProductRowEmpty />
+            ) : (
+              data.map((product, index) => (
+                <ProductRow key={product.id} index={index} product={product} />
+              ))
+            )}
           </tbody>
         </table>
       </div>

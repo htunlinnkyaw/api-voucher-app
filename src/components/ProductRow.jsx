@@ -1,7 +1,46 @@
-import React from "react";
+import React, { useState } from "react";
 import { HiOutlinePencil, HiOutlineTrash } from "react-icons/hi";
+import { useSWRConfig } from "swr";
+import endpoint from "../constant/endpoint";
 
-const ProductRow = () => {
+import { bouncy } from "ldrs";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
+
+bouncy.register();
+
+const ProductRow = ({
+  product: { id, product_name, price, created_at },
+  index,
+}) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const { mutate } = useSWRConfig();
+
+  const date = new Date(created_at);
+
+  const currentDate = date.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+
+  const currentTime = date.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+
+  const handleDeleteBtn = async () => {
+    setIsDeleting(true);
+    await fetch(`${endpoint}/products/${id}`, {
+      method: "DELETE",
+    });
+    mutate(`${endpoint}/products`);
+    setIsDeleting(false);
+    toast.success("Product Deleted Successfully");
+  };
+
   return (
     <>
       <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -9,25 +48,33 @@ const ProductRow = () => {
           scope="row"
           className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
         >
-          1
+          {index + 1}
         </th>
-        <td className="px-6 py-4">Mac Book</td>
-        <td className="px-6 py-4 text-end">$ 2999</td>
+        <td className="px-6 py-4">{product_name}</td>
+        <td className="px-6 py-4 text-end">${price}</td>
         <td className="px-6 py-4 text-end">
-          <p className="text-xs">15 Sept 2024</p>
-          <p className="text-xs">1:37 PM</p>
+          <p className="text-xs">{currentDate}</p>
+          <p className="text-xs">{currentTime}</p>
         </td>
         <td className="px-6 py-4 text-right">
           <div className="inline-flex rounded-md shadow-sm" role="group">
-            <button className="size-10 flex justify-center items-center text-lg font-medium text-stone-600 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white">
+            <Link
+              to={`/product/edit/${id}`}
+              className="size-10 flex justify-center items-center text-lg font-medium text-stone-600 bg-white border border-gray-200 rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
+            >
               <HiOutlinePencil />
-            </button>
+            </Link>
 
             <button
+              onClick={handleDeleteBtn}
               type="button"
               className="size-10 flex justify-center items-center text-lg font-medium text-red-600 bg-white border border-gray-200 rounded-e-lg hover:bg-gray-100 hover:text-red-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
             >
-              <HiOutlineTrash />
+              {isDeleting ? (
+                <l-bouncy size="15" speed="1.75" color="red"></l-bouncy>
+              ) : (
+                <HiOutlineTrash />
+              )}
             </button>
           </div>
         </td>
