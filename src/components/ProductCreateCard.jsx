@@ -53,7 +53,9 @@ const ProductCreateCard = () => {
           <div className="mb-6">
             <label
               htmlFor="product-name"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              className={`block mb-2 text-sm font-medium ${
+                errors.product_name ? "text-red-500" : "text-gray-900"
+              } dark:text-white`}
             >
               New Product Name
             </label>
@@ -91,7 +93,9 @@ const ProductCreateCard = () => {
           <div className="mb-6">
             <label
               htmlFor="product-price"
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              className={`block mb-2 text-sm font-medium ${
+                errors.product_price ? "text-red-500" : "text-gray-900"
+              } dark:text-white`}
             >
               Product Price
             </label>
